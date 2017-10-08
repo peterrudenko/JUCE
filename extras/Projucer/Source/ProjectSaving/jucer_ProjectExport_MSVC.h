@@ -534,6 +534,8 @@ public:
                 }
 
                 bool isUsingEditAndContinue = false;
+                const bool isUsingPch = getOwner().getUsePrecompiledHeadersBool();
+                const RelativePath pchPath(getOwner().getPrecompiledHeaderFileNameString(), getOwner().getTargetFolder(), RelativePath::buildTargetFolder);
 
                 {
                     auto* cl = group->createNewChildElement ("ClCompile");
@@ -556,7 +558,15 @@ public:
                     cl->createNewChildElement ("RuntimeLibrary")->addTextElement (config.isUsingRuntimeLibDLL() ? (isDebug ? "MultiThreadedDebugDLL" : "MultiThreadedDLL")
                                                                                                                 : (isDebug ? "MultiThreadedDebug"    : "MultiThreaded"));
                     cl->createNewChildElement ("RuntimeTypeInfo")->addTextElement ("true");
-                    cl->createNewChildElement ("PrecompiledHeader")->addTextElement ("NotUsing");
+
+                    XmlElement* precompiledHeaders = new XmlElement("PrecompiledHeader");
+                    if (isUsingPch)
+                    {
+                        precompiledHeaders->addTextElement("Use");
+                        cl->createNewChildElement("PrecompiledHeaderFile")->addTextElement(pchPath.getFileName());
+                    }
+                    cl->addChildElement(precompiledHeaders);
+
                     cl->createNewChildElement ("AssemblerListingLocation")->addTextElement ("$(IntDir)\\");
                     cl->createNewChildElement ("ObjectFileName")->addTextElement ("$(IntDir)\\");
                     cl->createNewChildElement ("ProgramDataBaseFileName")->addTextElement ("$(IntDir)\\");
@@ -834,36 +844,43 @@ public:
 
                 if (path.hasFileExtension (cOrCppFileExtensions) || path.hasFileExtension (asmFileExtensions))
                 {
-                    auto* e = cpps.createNewChildElement ("ClCompile");
-                    e->setAttribute ("Include", path.toWindowsStyle());
-
-                    if (shouldUseStdCall (path))
-                        e->createNewChildElement ("CallingConvention")->addTextElement ("StdCall");
+                    if (targetType == SharedCodeTarget || projectItem.shouldBeCompiled())
+                    {
+                        auto* e = cpps.createNewChildElement ("ClCompile");
+                        e->setAttribute ("Include", path.toWindowsStyle());
+                        
+                        if (shouldUseStdCall (path))
+                            e->createNewChildElement ("CallingConvention")->addTextElement ("StdCall");
 
                     if (projectItem.shouldBeCompiled())
                     {
                         auto extraCompilerFlags = owner.compilerFlagSchemesMap[projectItem.getCompilerFlagSchemeString()].get().toString();
 
-                        if (extraCompilerFlags.isNotEmpty())
-                            e->createNewChildElement ("AdditionalOptions")->addTextElement (extraCompilerFlags + " %(AdditionalOptions)");
-
-                        if (! projectItem.shouldSkipPCH())
+                            if (extraCompilerFlags.isNotEmpty())
+                                e->createNewChildElement ("AdditionalOptions")->addTextElement (extraCompilerFlags + " %(AdditionalOptions)");
+                        }
+                        else
                         {
-                            for (ConstConfigIterator i (owner); i.next();)
-                            {
-                                if (i->shouldUsePrecompiledHeaderFile())
-                                {
-                                    auto pchFile = owner.getTargetFolder().getChildFile (i->getPrecompiledHeaderFilename()).withFileExtension (".h");
+                            e->createNewChildElement ("ExcludedFromBuild")->addTextElement ("true");
+                        }
 
-                                    if (pchFile.existsAsFile())
-                                        setSourceFilePCHSettings (*e, pchFile, "Use", *i);
+                        if (getOwner().getUsePrecompiledHeadersBool())
+                        {
+                            const RelativePath pchPath(getOwner().getPrecompiledHeaderFileNameString(), getOwner().getTargetFolder(), RelativePath::buildTargetFolder);
+                            const String precompiledHeaderBaseName = pchPath.getFileNameWithoutExtension();
+                            if (precompiledHeaderBaseName == path.getFileNameWithoutExtension()) {
+                                e->createNewChildElement("PrecompiledHeader")->addTextElement("Create");
+                            } else {
+                                StringArray wildcards;
+                                wildcards.addTokens(getOwner().getPrecompiledHeaderExcludedWildcardString(), "|;,", "\"");
+                                for (String wildcard : wildcards) {
+                                    if (path.getFileNameWithoutExtension().matchesWildcard(wildcard, true)) {
+                                        e->createNewChildElement("PrecompiledHeader")->addTextElement("NotUsing");
+                                        break;
+                                    }
                                 }
                             }
                         }
-                    }
-                    else
-                    {
-                        e->createNewChildElement ("ExcludedFromBuild")->addTextElement ("true");
                     }
                 }
                 else if (path.hasFileExtension (headerFileExtensions))

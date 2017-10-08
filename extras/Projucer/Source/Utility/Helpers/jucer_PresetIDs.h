@@ -53,6 +53,9 @@ namespace Ids
     DECLARE_ID (precompiledHeaderFile);
     DECLARE_ID (displaySplashScreen);
     DECLARE_ID (splashScreenColour);
+    DECLARE_ID (usePrecompiledHeaders);
+    DECLARE_ID (precompiledHeaderFileName);
+    DECLARE_ID (precompiledHeaderExcludedWildcard);
     DECLARE_ID (position);
     DECLARE_ID (source);
     DECLARE_ID (width);

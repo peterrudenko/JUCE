@@ -144,6 +144,13 @@ public:
 
     bool shouldUseGNUExtensions() const                   { return gnuExtensionsValue.get(); }
 
+    Value getUsePrecompiledHeaders()                      { return getSetting (Ids::usePrecompiledHeaders); }
+    bool getUsePrecompiledHeadersBool() const             { return (getSettingString (Ids::usePrecompiledHeaders) == "1"); }
+    Value getPrecompiledHeaderFileName()                  { return getSetting (Ids::precompiledHeaderFileName); }
+    Value getPrecompiledHeaderExcludedWildcard()          { return getSetting(Ids::precompiledHeaderExcludedWildcard); }
+    String getPrecompiledHeaderFileNameString() const     { return (getSettingString (Ids::precompiledHeaderFileName)); }
+    String getPrecompiledHeaderExcludedWildcardString() const  { return (getSettingString(Ids::precompiledHeaderExcludedWildcard)); }
+
     String getVSTLegacyPathString() const                 { return vstLegacyPathValueWrapper.getCurrentValue(); }
     String getAAXPathString() const                       { return aaxPathValueWrapper.getCurrentValue(); }
     String getRTASPathString() const                      { return rtasPathValueWrapper.getCurrentValue(); }

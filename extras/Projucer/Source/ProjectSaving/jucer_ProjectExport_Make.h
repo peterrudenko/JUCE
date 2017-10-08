@@ -295,6 +295,7 @@ public:
             jassert (type != AggregateTarget);
 
             out << getBuildProduct() << " : "
+                << (owner.getUsePrecompiledHeadersBool() ? "$(PCH_OUT) " : "")
                 << "$(OBJECTS_" << getTargetVarName() << ") $(RESOURCES)";
 
             if (type != SharedCodeTarget && owner.shouldBuildTargetType (SharedCodeTarget))
@@ -747,6 +748,15 @@ private:
     {
         auto n = targets.size();
 
+        MemoryOutputStream pchLines;
+        if (getUsePrecompiledHeadersBool())
+        {
+            pchLines << "$(PCH_OUT): $(PCH_SRC)" << newLine
+                     << "\t@echo \"Generating precompiled header\"" << newLine
+                     << "\t$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o \"$@\" -c \"$<\"" << newLine
+                     << newLine;
+        }
+
         for (int i = 0; i < n; ++i)
         {
             if (auto* target = targets.getUnchecked (i))
@@ -773,13 +783,15 @@ private:
                     }
 
                     out << "all : " << dependencies.joinIntoString (" ") << newLine << newLine;
-                    out << subTargetLines.toString()                     << newLine << newLine;
+                    out << pchLines.toString();
+                    out << subTargetLines.toString() << newLine << newLine;
                 }
                 else
                 {
                     if (! getProject().isAudioPluginProject())
                         out << "all : " << target->getBuildProduct() << newLine << newLine;
 
+                    out << pchLines.toString();
                     target->writeTargetLine (out, packages);
                 }
             }
@@ -975,6 +987,15 @@ private:
 
         for (auto target : targets)
             target->writeObjects (out, getFilesForTarget (filesToCompile, target, project));
+
+        if (getUsePrecompiledHeadersBool())
+        {
+            const String pchFileName = getPrecompiledHeaderFileNameString();
+            const String gchFileName = getPrecompiledHeaderFileNameString() + ".gch";
+            out << "PCH_SRC = " << pchFileName << newLine
+                << "PCH_OUT = " << gchFileName << newLine
+                << newLine;
+        }
 
         out << getPhonyTargetLine() << newLine << newLine;
 
