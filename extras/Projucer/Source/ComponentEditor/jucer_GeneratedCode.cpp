@@ -171,7 +171,7 @@ String GeneratedCode::getClassDeclaration() const
         parentClassLines.removeString ("public juce::Component", false);
 
     String r ("class ");
-    r << className << "  : ";
+    r << className << " final : ";
 
     r += parentClassLines.joinIntoString (",\n" + String::repeatedString (" ", r.length()));
 

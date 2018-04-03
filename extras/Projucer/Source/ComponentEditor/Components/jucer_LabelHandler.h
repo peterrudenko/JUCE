@@ -129,20 +129,21 @@ public:
 
         String s;
 
-        s << memberVariableName << "->setFont ("
+        s << "this->"
+          << memberVariableName << "->setFont("
           << FontPropertyComponent::getCompleteFontCode (l->getFont(), l->getProperties().getWithDefault ("typefaceName", FontPropertyComponent::getDefaultFont()))
           << ");\n"
-          << memberVariableName << "->setJustificationType ("
+          << memberVariableName << "->setJustificationType("
           << CodeHelpers::justificationToCode (l->getJustificationType())
           << ");\n"
-          << memberVariableName << "->setEditable ("
+          << memberVariableName << "->setEditable("
           << CodeHelpers::boolLiteral (l->isEditableOnSingleClick()) << ", "
           << CodeHelpers::boolLiteral (l->isEditableOnDoubleClick()) << ", "
           << CodeHelpers::boolLiteral (l->doesLossOfFocusDiscardChanges()) << ");\n"
           << getColourIntialisationCode (component, memberVariableName);
 
         if (needsCallback (component))
-            s << memberVariableName << "->addListener (this);\n";
+            s << "this->" << memberVariableName << "->addListener(this);\n";
 
         s << '\n';
 
@@ -155,9 +156,9 @@ public:
 
         if (needsCallback (component))
         {
-            String& callback = code.getCallbackCode ("public juce::Label::Listener",
+            String& callback = code.getCallbackCode ("public Label::Listener",
                                                      "void",
-                                                     "labelTextChanged (juce::Label* labelThatHasChanged)",
+                                                     "labelTextChanged(Label *labelThatHasChanged)",
                                                      true);
 
             if (callback.trim().isNotEmpty())
@@ -167,7 +168,7 @@ public:
             const String userCodeComment ("UserLabelCode_" + memberVariableName);
 
             callback
-                << "if (labelThatHasChanged == " << memberVariableName << ".get())\n"
+                << "if (this->labelThatHasChanged == " << memberVariableName << ".get())\n"
                 << "{\n    //[" << userCodeComment << "] -- add your label text handling code here..\n    //[/" << userCodeComment << "]\n}\n";
         }
     }

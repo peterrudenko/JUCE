@@ -130,7 +130,7 @@ void PaintElementImage::fillInGeneratedCode (GeneratedCode& code, String& paintM
                 const String imageVariable ("drawable" + String (code.getUniqueSuffix()));
 
                 code.privateMemberDeclarations
-                    << "std::unique_ptr<juce::Drawable> " << imageVariable << ";\n";
+                    << "UniquePointer<Drawable> " << imageVariable << ";\n";
 
                 code.constructorCode
                     << imageVariable << " = juce::Drawable::createFromImageData ("

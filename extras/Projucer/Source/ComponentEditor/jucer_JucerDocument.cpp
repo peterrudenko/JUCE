@@ -435,7 +435,7 @@ void JucerDocument::fillInGeneratedCode (GeneratedCode& code) const
            "//[/UserPreSize]\n";
 
     if (initialWidth > 0 || initialHeight > 0)
-        code.constructorCode << "\nsetSize (" << initialWidth << ", " << initialHeight << ");\n";
+        code.constructorCode << "\nthis->setSize(" << initialWidth << ", " << initialHeight << ");\n";
 
     code.getCallbackCode (String(), "void", "paint (juce::Graphics& g)", false)
         << "//[UserPaint] Add your own custom painting code here..\n//[/UserPaint]";

@@ -104,7 +104,7 @@ public:
         if (b->getButtonText() != b->getName())
         {
             code.constructorCode
-              << memberVariableName << "->setButtonText ("
+              << memberVariableName << "->setButtonText("
               << quotedString (b->getButtonText(), code.shouldUseTransMacro()) << ");\n";
         }
 
@@ -132,11 +132,11 @@ public:
         }
 
         if (b->getRadioGroupId() != 0)
-            code.constructorCode << memberVariableName << "->setRadioGroupId ("
+            code.constructorCode << memberVariableName << "->setRadioGroupId("
                                  << b->getRadioGroupId() << ");\n";
 
         if (needsButtonListener (component))
-            code.constructorCode << memberVariableName << "->addListener (this);\n";
+            code.constructorCode << memberVariableName << "->addListener(this);\n";
     }
 
     void fillInGeneratedCode (Component* component, GeneratedCode& code) override
@@ -145,9 +145,9 @@ public:
 
         if (needsButtonListener (component))
         {
-            String& callback = code.getCallbackCode ("public juce::Button::Listener",
+            String& callback = code.getCallbackCode ("public Button::Listener",
                                                      "void",
-                                                     "buttonClicked (juce::Button* buttonThatWasClicked)",
+                                                     "buttonClicked(Button *buttonThatWasClicked)",
                                                      true);
 
             if (callback.isNotEmpty())

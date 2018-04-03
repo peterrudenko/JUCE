@@ -526,7 +526,7 @@ String ComponentTypeHandler::getColourIntialisationCode (Component* component,
     {
         if (component->isColourSpecified (colours[i]->colourId))
         {
-            s << objectName << "->setColour ("
+            s << objectName << "->setColour("
               << colours[i]->colourIdCode
               << ", "
               << CodeHelpers::colourToCode (component->findColour (colours[i]->colourId))
@@ -558,7 +558,7 @@ void ComponentTypeHandler::fillInMemberVariableDeclarations (GeneratedCode& code
         clsName = getClassName (component);
 
     code.privateMemberDeclarations
-        << "std::unique_ptr<" << clsName << "> " << memberVariableName << ";\n";
+        << "UniquePointer<" << clsName << "> " << memberVariableName << ";\n";
 }
 
 void ComponentTypeHandler::fillInResizeCode (GeneratedCode& code, Component* component, const String& memberVariableName)
@@ -568,7 +568,7 @@ void ComponentTypeHandler::fillInResizeCode (GeneratedCode& code, Component* com
     String x, y, w, h, r;
     positionToCode (pos, code.document->getComponentLayout(), x, y, w, h);
 
-    r << memberVariableName << "->setBounds ("
+    r << memberVariableName << "->setBounds("
       << x << ", " << y << ", " << w << ", " << h << ");\n";
 
     if (pos.rect.isPositionAbsolute() && ! code.document->getComponentLayout()->isComponentPositionRelative (component))
@@ -588,7 +588,7 @@ void ComponentTypeHandler::fillInCreationCode (GeneratedCode& code, Component* c
     const String virtualName (component->getProperties() ["virtualName"].toString());
 
     String s;
-    s << memberVariableName << ".reset (new ";
+    s << "this->" << memberVariableName << ".reset(new ";
 
     if (virtualName.isNotEmpty())
         s << build_tools::makeValidIdentifier (virtualName, false, false, true);
@@ -606,24 +606,24 @@ void ComponentTypeHandler::fillInCreationCode (GeneratedCode& code, Component* c
 
         params = lines.joinIntoString ("\n" + String::repeatedString (" ", s.length() + 2));
 
-        s << " (" << params << "));\n";
+        s << "(" << params << "));\n";
     }
 
-    s << "addAndMakeVisible (" << memberVariableName << ".get());\n";
+    s << "this->addAndMakeVisible(" << memberVariableName << ".get());\n";
 
 
     if (SettableTooltipClient* ttc = dynamic_cast<SettableTooltipClient*> (component))
     {
         if (ttc->getTooltip().isNotEmpty())
         {
-            s << memberVariableName << "->setTooltip ("
+            s << memberVariableName << "->setTooltip("
               << quotedString (ttc->getTooltip(), code.shouldUseTransMacro())
               << ");\n";
         }
     }
 
     if (component->getExplicitFocusOrder() > 0)
-        s << memberVariableName << "->setExplicitFocusOrder ("
+        s << memberVariableName << "->setExplicitFocusOrder("
           << component->getExplicitFocusOrder()
           << ");\n";
 
