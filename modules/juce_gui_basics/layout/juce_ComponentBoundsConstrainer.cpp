@@ -141,10 +141,7 @@ void ComponentBoundsConstrainer::checkComponentBounds (Component* component)
 
 void ComponentBoundsConstrainer::applyBoundsToComponent (Component& component, Rectangle<int> bounds)
 {
-    if (auto* positioner = component.getPositioner())
-        positioner->applyNewBounds (bounds);
-    else
-        component.setBounds (bounds);
+    component.setBounds(bounds);
 }
 
 //==============================================================================

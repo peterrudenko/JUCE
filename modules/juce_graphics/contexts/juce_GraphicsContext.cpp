@@ -355,12 +355,12 @@ void Graphics::fillRect (Rectangle<float> r) const
 
 void Graphics::fillRect (int x, int y, int width, int height) const
 {
-    context.fillRect (coordsToRectangle (x, y, width, height), false);
+    context.fillRect({ x, y, width, height }, false);
 }
 
 void Graphics::fillRect (float x, float y, float width, float height) const
 {
-    fillRect (coordsToRectangle (x, y, width, height));
+    context.fillRect({ x, y, width, height });
 }
 
 void Graphics::fillRectList (const RectangleList<float>& rectangles) const
