@@ -255,23 +255,7 @@ private:
 
 void RelativeRectangle::applyToComponent (Component& component) const
 {
-    if (isDynamic())
-    {
-        RelativeRectangleComponentPositioner* current = dynamic_cast<RelativeRectangleComponentPositioner*> (component.getPositioner());
-
-        if (current == nullptr || ! current->isUsingRectangle (*this))
-        {
-            RelativeRectangleComponentPositioner* p = new RelativeRectangleComponentPositioner (component, *this);
-
-            component.setPositioner (p);
-            p->apply();
-        }
-    }
-    else
-    {
-        component.setPositioner (nullptr);
-        component.setBounds (resolve (nullptr).getSmallestIntegerContainer());
-    }
+    component.setBounds (resolve (nullptr).getSmallestIntegerContainer());
 }
 
 } // namespace juce

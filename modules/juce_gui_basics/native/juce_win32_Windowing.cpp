@@ -4720,7 +4720,7 @@ void* MouseCursor::createStandardMouseCursor (const MouseCursor::StandardCursorT
                 };
                 const int copyCursorSize = 119;
 
-                copyCursor = CustomMouseCursorInfo (ImageFileFormat::loadFrom (copyCursorData, copyCursorSize), { 1, 3 }).create();
+                copyCursor = CustomMouseCursorInfo (ImageFileFormat::loadFrom (copyCursorData, copyCursorSize), { 1, 0 }).create();
             }
 
             return copyCursor;

@@ -72,8 +72,6 @@ void ResizableCornerComponent::mouseDrag (const MouseEvent& e)
 
     if (constrainer != nullptr)
         constrainer->setBoundsForComponent (component, r, false, false, true, true);
-    else if (auto pos = component->getPositioner())
-        pos->applyNewBounds (r);
     else
         component->setBounds (r);
 }
