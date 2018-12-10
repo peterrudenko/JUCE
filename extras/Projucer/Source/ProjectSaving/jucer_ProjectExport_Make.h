@@ -1011,7 +1011,7 @@ private:
 
         out << "strip:"                                                       << newLine
             << "\t@echo Stripping " << projectName                            << newLine
-            << "\t-$(V_AT)$(STRIP) --strip-unneeded $(JUCE_OUTDIR)/$(TARGET)" << newLine
+            << "\t-$(V_AT)$(STRIP) --strip-unneeded $(JUCE_OUTDIR)/$(JUCE_TARGET_APP)" << newLine
             << newLine;
 
         writeIncludeLines (out);
