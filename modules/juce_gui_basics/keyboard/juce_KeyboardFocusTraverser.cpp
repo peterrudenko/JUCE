@@ -28,10 +28,9 @@ namespace juce
 
 namespace KeyboardFocusHelpers
 {
-    static int getOrder (const Component* c)
+    static int getOrder (const Component*)
     {
-        auto order = c->getExplicitFocusOrder();
-        return order > 0 ? order : (std::numeric_limits<int>::max() / 2);
+        return (std::numeric_limits<int>::max() / 2);
     }
 
     static void findAllFocusableComponents (Component* parent, Array<Component*>& comps)

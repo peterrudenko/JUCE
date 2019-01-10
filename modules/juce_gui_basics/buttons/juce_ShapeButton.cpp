@@ -77,7 +77,6 @@ void ShapeButton::setShape (const Path& newShape,
     maintainShapeProportions = maintainShapeProportions_;
 
     shadow.setShadowProperties (DropShadow (Colours::black.withAlpha (0.5f), 3, Point<int>()));
-    setComponentEffect (hasShadow ? &shadow : nullptr);
 
     if (resizeNowToFitThisShape)
     {
@@ -107,10 +106,7 @@ void ShapeButton::paintButton (Graphics& g, bool shouldDrawButtonAsHighlighted, 
     auto r = border.subtractedFrom (getLocalBounds())
                    .toFloat()
                    .reduced (outlineWidth * 0.5f);
-
-    if (getComponentEffect() != nullptr)
-        r = r.reduced (2.0f);
-
+    
     if (shouldDrawButtonAsDown)
     {
         const float sizeReductionWhenPressed = 0.04f;

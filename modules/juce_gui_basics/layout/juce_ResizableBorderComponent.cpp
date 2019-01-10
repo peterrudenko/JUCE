@@ -149,10 +149,7 @@ void ResizableBorderComponent::mouseDrag (const MouseEvent& e)
     }
     else
     {
-        if (auto* p = component->getPositioner())
-            p->applyNewBounds (newBounds);
-        else
-            component->setBounds (newBounds);
+        component->setBounds (newBounds);
     }
 }
 
