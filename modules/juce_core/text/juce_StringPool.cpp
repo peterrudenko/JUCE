@@ -23,7 +23,7 @@
 namespace juce
 {
 
-static const int minNumberOfStringsForGarbageCollection = 300;
+static const int minNumberOfStringsForGarbageCollection = 900;
 static const uint32 garbageCollectionInterval = 30000;
 
 

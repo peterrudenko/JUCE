@@ -472,6 +472,8 @@ private:
         Ptr safeThis (this);
         threadHasReference.signal();
 
+        ::CoInitialize(nullptr);
+
         auto r = openDialog (true);
         MessageManager::callAsync (AsyncCallback (std::move (safeThis), std::move (r)));
     }

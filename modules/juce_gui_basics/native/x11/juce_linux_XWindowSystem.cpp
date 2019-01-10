@@ -2087,7 +2087,7 @@ void* XWindowSystem::createStandardMouseCursor (MouseCursor::StandardCursorType 
                 252,114,147,74,83,5,50,68,147,208,217,16,71,149,252,124,5,0,59,0,0
             };
 
-            return CustomMouseCursorInfo (ImageFileFormat::loadFrom (copyCursorData, (size_t) numElementsInArray (copyCursorData)), { 1, 3 }).create();
+            return CustomMouseCursorInfo (ImageFileFormat::loadFrom (copyCursorData, (size_t) numElementsInArray (copyCursorData)), { 1, 0 }).create();
         }
 
         case MouseCursor::NumStandardCursorTypes:
