@@ -67,6 +67,7 @@ Result ProjectSaver::saveResourcesOnly()
 
 void ProjectSaver::saveBasicProjectItems (const OwnedArray<LibraryModule>& modules, const String& appConfigUserContent)
 {
+    writeUnityBuildFile(project.getMainGroup());
     writePluginDefines();
     writeAppConfigFile (modules, appConfigUserContent);
     writeBinaryDataFiles();
@@ -214,6 +215,11 @@ File ProjectSaver::getAppConfigFile() const
 File ProjectSaver::getPluginDefinesFile() const
 {
     return generatedCodeFolder.getChildFile (Project::getPluginDefinesFilename());
+}
+
+File ProjectSaver::getUnityBuildCppFile() const
+{
+    return generatedCodeFolder.getChildFile(Project::getUnityBuildCppFilename());
 }
 
 String ProjectSaver::loadUserContentFromAppConfig() const
@@ -825,10 +831,33 @@ void ProjectSaver::runPostExportScript()
     }
 }
 
+void ProjectSaver::uncheckCompileFlagAndCollectValues(Project::Item root)
+{
+    auto compiledValue = root.getShouldCompileValue();
+    if (root.isFile() && root.shouldBeCompiled())
+    {
+        compiledValue.setValue(false);
+    }
+
+    for (int i = 0; i < root.getNumChildren(); ++i)
+    {
+        uncheckCompileFlagAndCollectValues(root.getChild(i));
+    }
+}
+
 void ProjectSaver::saveExporter (ProjectExporter& exporter, const OwnedArray<LibraryModule>& modules)
 {
     try
     {
+        // Update `compiled` flags accordingly:
+        auto unityBuildItem = exporter.getUnityBuildItem(getUnityBuildCppFile(), this->generatedFilesGroup.getID());
+        unityBuildItem.getShouldCompileValue().setValue(exporter.shouldUseUnityBuild());
+        if (exporter.shouldUseUnityBuild())
+        {
+            auto sourceGroup = exporter.getSourceGroup();
+            uncheckCompileFlagAndCollectValues(sourceGroup);
+        }
+
         exporter.create (modules);
 
         if (! exporter.isCLion())
@@ -845,4 +874,40 @@ void ProjectSaver::saveExporter (ProjectExporter& exporter, const OwnedArray<Lib
     {
         addError (error.message);
     }
+}
+
+void ProjectSaver::writeUnityBuildSources(MemoryOutputStream& source, const Project::Item& projectRoot)
+{
+    writeAutoGenWarningComment(source);
+    source << "    Unity build." << newLine
+        << "    Incredible fucking awesomeness." << newLine << newLine
+        << "*/" << newLine << newLine;
+    writeUnityBuildItems(source, projectRoot, sourceFileExtensions);
+}
+
+void ProjectSaver::writeUnityBuildItems(MemoryOutputStream& src, const Project::Item& projectItem, const String& extension)
+{
+    if (projectItem.isGroup())
+    {
+        for (int i = 0; i < projectItem.getNumChildren(); ++i)
+        {
+            writeUnityBuildItems(src, projectItem.getChild(i), extension);
+        }
+    }
+    else
+    {
+        if (projectItem.getFile().hasFileExtension(extension))
+        {
+            src << "#include \"" << projectItem.getFilePath() << "\"" << newLine;
+        }
+    }
+}
+
+void ProjectSaver::writeUnityBuildFile(const Project::Item& projectItem)
+{
+    MemoryOutputStream mem;
+    mem.setNewLineString(projectLineFeed);
+
+    writeUnityBuildSources(mem, projectItem);
+    saveGeneratedFile(project.getUnityBuildCppFilename(), mem);
 }

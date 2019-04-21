@@ -81,6 +81,7 @@ private:
 
     File getAppConfigFile() const;
     File getPluginDefinesFile() const;
+    File getUnityBuildCppFile() const;
 
     String loadUserContentFromAppConfig() const;
     String getAudioPluginDefines() const;
@@ -106,7 +107,12 @@ private:
     void writeUnityScriptFile();
     void writeProjects (const OwnedArray<LibraryModule>&, ProjectExporter*);
     void runPostExportScript();
-    void saveExporter (ProjectExporter& exporter, const OwnedArray<LibraryModule>& modules);
+    void uncheckCompileFlagAndCollectValues(Project::Item root);
+    void saveExporter(ProjectExporter& exporter, const OwnedArray<LibraryModule>& modules);
+
+    void writeUnityBuildSources(MemoryOutputStream& source, const Project::Item& projectRoot);
+    void writeUnityBuildItems(MemoryOutputStream& src, const Project::Item& projectItem, const String& extension);
+    void writeUnityBuildFile(const Project::Item& projectItem);
 
     //==============================================================================
     Project& project;

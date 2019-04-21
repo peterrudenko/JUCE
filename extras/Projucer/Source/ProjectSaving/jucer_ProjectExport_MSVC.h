@@ -535,7 +535,8 @@ public:
 
                 bool isUsingEditAndContinue = false;
                 const bool isUsingPch = getOwner().getUsePrecompiledHeadersBool();
-                const RelativePath pchPath(getOwner().getPrecompiledHeaderFileNameString(), getOwner().getTargetFolder(), RelativePath::buildTargetFolder);
+                const build_tools::RelativePath pchPath(getOwner().getPrecompiledHeaderFileNameString(),
+                    getOwner().getTargetFolder(), build_tools::RelativePath::buildTargetFolder);
 
                 {
                     auto* cl = group->createNewChildElement ("ClCompile");
@@ -866,7 +867,8 @@ public:
 
                         if (getOwner().getUsePrecompiledHeadersBool())
                         {
-                            const RelativePath pchPath(getOwner().getPrecompiledHeaderFileNameString(), getOwner().getTargetFolder(), RelativePath::buildTargetFolder);
+                            const build_tools::RelativePath pchPath(getOwner().getPrecompiledHeaderFileNameString(),
+                                getOwner().getTargetFolder(), build_tools::RelativePath::buildTargetFolder);
                             const String precompiledHeaderBaseName = pchPath.getFileNameWithoutExtension();
                             if (precompiledHeaderBaseName == path.getFileNameWithoutExtension()) {
                                 e->createNewChildElement("PrecompiledHeader")->addTextElement("Create");

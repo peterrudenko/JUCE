@@ -205,11 +205,13 @@ ProjectExporter::ProjectExporter (Project& p, const ValueTree& state)
       gnuExtensionsValue      (settings, Ids::enableGNUExtensions, getUndoManager()),
       bigIconValue            (settings, Ids::bigIcon,             getUndoManager()),
       smallIconValue          (settings, Ids::smallIcon,           getUndoManager()),
-      extraPPDefsValue        (settings, Ids::extraDefs,           getUndoManager())
+      extraPPDefsValue        (settings, Ids::extraDefs,           getUndoManager()),
+      unityBuildValue         (settings, Ids::unityBuild,          getUndoManager())
 {
     projectCompilerFlagSchemesValue = project.getProjectValue (Ids::compilerFlagSchemes);
     projectCompilerFlagSchemesValue.addListener (this);
     updateCompilerFlagValues();
+    unityBuildValue.setDefault(false);
 }
 
 String ProjectExporter::getUniqueName() const
@@ -307,6 +309,10 @@ void ProjectExporter::createPropertyEditors (PropertyListBuilder& props)
         props.add (new TextPropertyComponent (externalLibrariesValue, "External Libraries to Link", 8192, true),
                    "Additional libraries to link (one per line). You should not add any platform specific decoration to these names. "
                    "This string can contain references to preprocessor definitions in the form ${NAME_OF_VALUE}, which will be replaced with their values.");
+
+        props.add(new ChoicePropertyComponent(unityBuildValue, "Unity Build"),
+            "Enabling this will optionally generate unity build in addition - or instead if - the normal one. "
+            "Note that you better disable precompiled headers for unity builds.");
 
         props.add (new BooleanPropertyComponent(getUsePrecompiledHeaders(), "Use Precompiled Headers", "Use Precompiled Headers"),
             "Enable this to generate precompiled headers with the project.  Make sure to set the precompiled header "
@@ -545,6 +551,39 @@ StringArray ProjectExporter::getLinuxPackages (PackageDependencyType type) const
     packages.removeDuplicates (false);
 
     return packages;
+}
+
+Project::Item ProjectExporter::getSourceGroup()
+{
+    for (const auto &subgroup : itemGroups)
+    {
+        for (int i = 0; i < subgroup.getNumChildren(); ++i)
+        {
+            auto child = subgroup.getChild(i);
+            const auto childName = child.getName();
+            if (child.isGroup() && childName.equalsIgnoreCase("source"))
+            {
+                return child;
+            }
+        }
+    }
+
+    jassertfalse;
+    return itemGroups.getReference(0);
+}
+
+Project::Item ProjectExporter::getUnityBuildItem(const File &file, const String &generatedGroupId)
+{
+    for (const auto &subgroup : itemGroups)
+    {
+        if (subgroup.isGroup() && subgroup.getID() == generatedGroupId)
+        {
+            return subgroup.findItemForFile(file);
+        }
+    }
+
+    jassertfalse;
+    return itemGroups.getReference(0);
 }
 
 void ProjectExporter::addProjectPathToBuildPathList (StringArray& pathList,

@@ -44,7 +44,7 @@ void LatestVersionCheckerAndUpdater::checkForNewVersion (bool background)
     if (! isThreadRunning())
     {
         backgroundCheck = background;
-        startThread (3);
+        //startThread (3);
     }
 }
 

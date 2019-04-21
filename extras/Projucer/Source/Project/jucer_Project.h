@@ -147,8 +147,10 @@ public:
     File getBinaryDataCppFile (int index) const;
     File getBinaryDataHeaderFile() const                        { return getBinaryDataCppFile (0).withFileExtension (".h"); }
 
+    static String getUnityBuildCppFilename()                    { return "UnityBuild.cpp"; }
     static String getAppConfigFilename()                        { return "AppConfig.h"; }
     static String getPluginDefinesFilename()                    { return "JucePluginDefines.h"; }
+    static String getJuceSourceFilenameRoot()                   { return "JuceLibraryCode"; }
     static String getJuceSourceHFilename()                      { return "JuceHeader.h"; }
 
     //==============================================================================
